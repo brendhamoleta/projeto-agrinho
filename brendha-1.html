@@ -1,0 +1,337 @@
+
+
+               }
+           }
+
+
+           if(cabe){
+               for(let i=0;i<palavra.length;i++){
+                   grid[linha][coluna+i]=palavra[i];
+               }
+               colocada=true;
+           }<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caça-Palavras Agro</title>
+
+
+<style>
+body{
+   font-family: Arial, sans-serif;
+   text-align:center;
+   background: linear-gradient(135deg,#4CAF50,#8BC34A,#FFC107);
+   min-height:100vh;
+   margin:0;
+   padding:20px;
+}
+
+
+h1{
+   color:white;
+   text-shadow:2px 2px 4px rgba(0,0,0,0.3);
+}
+
+
+#palavras{
+   background:white;
+   max-width:500px;
+   margin:15px auto;
+   padding:15px;
+   border-radius:12px;
+   box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+#palavras span{
+   display:inline-block;
+   margin:5px;
+   padding:8px 12px;
+   border-radius:20px;
+   background:#E8F5E9;
+   font-weight:bold;
+}
+
+
+.encontrada{
+   background:#4CAF50 !important;
+   color:white;
+   text-decoration:line-through;
+}
+
+
+#grid{
+   display:grid;
+   grid-template-columns:repeat(12,45px);
+   gap:4px;
+   justify-content:center;
+   margin-top:20px;
+}
+
+
+.letra{
+   width:45px;
+   height:45px;
+   background:white;
+   border-radius:8px;
+   display:flex;
+   align-items:center;
+   justify-content:center;
+   font-size:22px;
+   font-weight:bold;
+   cursor:pointer;
+   user-select:none;
+   transition:0.2s;
+}
+
+
+.letra:hover{
+   transform:scale(1.08);
+}
+
+
+.selecionada{
+   background:#FFEB3B;
+}
+
+
+.correta{
+   background:#2196F3 !important;
+   color:white;
+}
+
+
+#mensagem{
+   margin-top:20px;
+   font-size:22px;
+   font-weight:bold;
+   color:white;
+}
+</style>
+</head>
+<body>
+
+
+<h1>🌱 Caça-Palavras do Agro 🚜</h1>
+
+
+<div id="palavras"></div>
+
+
+<div id="grid"></div>
+
+
+<div id="mensagem"></div>
+
+
+<script>
+const palavras = [
+   "SOJA",
+   "MILHO",
+   "TRATOR",
+   "AGRO",
+   "COLHEITA",
+   "FAZENDA",
+   "SEMENTE"
+];
+
+
+const tamanho = 12;
+const grid = Array(tamanho).fill().map(()=>Array(tamanho).fill(''));
+
+
+function colocarPalavra(palavra){
+   let colocada = false;
+
+
+   while(!colocada){
+       const horizontal = Math.random() > 0.5;
+
+
+       if(horizontal){
+           const linha = Math.floor(Math.random()*tamanho);
+           const coluna = Math.floor(Math.random()*(tamanho-palavra.length));
+
+
+           let cabe = true;
+
+
+           for(let i=0;i<palavra.length;i++){
+               if(grid[linha][coluna+i] &&
+                  grid[linha][coluna+i] !== palavra[i]){
+                   cabe=false;
+       }else{
+           const linha = Math.floor(Math.random()*(tamanho-palavra.length));
+           const coluna = Math.floor(Math.random()*tamanho);
+
+
+           let cabe = true;
+
+
+           for(let i=0;i<palavra.length;i++){
+               if(grid[linha+i][coluna] &&
+                  grid[linha+i][coluna] !== palavra[i]){
+                   cabe=false;
+               }
+           }
+
+
+           if(cabe){
+               for(let i=0;i<palavra.length;i++){
+                   grid[linha+i][coluna]=palavra[i];
+               }
+               colocada=true;
+           }
+       }
+   }
+}
+
+
+palavras.forEach(colocarPalavra);
+
+
+for(let l=0;l<tamanho;l++){
+   for(let c=0;c<tamanho;c++){
+       if(grid[l][c]===''){
+           grid[l][c]=String.fromCharCode(
+               65 + Math.floor(Math.random()*26)
+           );
+       }
+   }
+}
+
+
+const listaDiv = document.getElementById("palavras");
+
+
+palavras.forEach(p=>{
+   const span=document.createElement("span");
+   span.textContent=p;
+   span.id="p-"+p;
+   listaDiv.appendChild(span);
+});
+
+
+const gridDiv = document.getElementById("grid");
+
+
+let selecionando=false;
+let letrasSelecionadas=[];
+let elementosSelecionados=[];
+
+
+function limparSelecao(){
+   elementosSelecionados.forEach(el=>{
+       if(!el.classList.contains("correta")){
+           el.classList.remove("selecionada");
+       }
+   });
+
+
+   letrasSelecionadas=[];
+   elementosSelecionados=[];
+}
+
+
+for(let l=0;l<tamanho;l++){
+   for(let c=0;c<tamanho;c++){
+
+
+       const div=document.createElement("div");
+       div.className="letra";
+       div.textContent=grid[l][c];
+
+
+       div.addEventListener("mousedown",()=>{
+           selecionando=true;
+           limparSelecao();
+
+
+           letrasSelecionadas.push(div.textContent);
+           elementosSelecionados.push(div);
+
+
+           div.classList.add("selecionada");
+       });
+
+
+       div.addEventListener("mouseover",()=>{
+           if(selecionando){
+               letrasSelecionadas.push(div.textContent);
+               elementosSelecionados.push(div);
+               div.classList.add("selecionada");
+           }
+       });
+
+
+       gridDiv.appendChild(div);
+   }
+}
+
+
+document.addEventListener("mouseup",()=>{
+
+
+   if(!selecionando) return;
+
+
+   selecionando=false;
+
+
+   const palavra = letrasSelecionadas.join("");
+
+
+   const reversa = palavra.split("").reverse().join("");
+
+
+   if(
+       palavras.includes(palavra) ||
+       palavras.includes(reversa)
+   ){
+
+
+       const encontrada =
+           palavras.includes(palavra)
+           ? palavra
+           : reversa;
+
+
+       elementosSelecionados.forEach(el=>{
+           el.classList.remove("selecionada");
+           el.classList.add("correta");
+       });
+
+
+       document
+           .getElementById("p-"+encontrada)
+           .classList.add("encontrada");
+
+
+       verificarFim();
+
+
+   }else{
+       setTimeout(limparSelecao,200);
+   }
+});
+
+
+function verificarFim(){
+
+
+   const total =
+       document.querySelectorAll(".encontrada").length;
+
+
+   if(total === palavras.length){
+       document.getElementById("mensagem")
+       .innerHTML =
+       "🎉 Parabéns! Você encontrou todas as palavras do Agro! 🌾";
+   }
+}
+</script>
+
+
+</body>
+</html>
